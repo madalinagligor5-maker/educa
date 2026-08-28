@@ -1,10 +1,28 @@
 import type { Metadata } from "next";
-import Navbar from "@/components/Navbar";
+import { Baloo_2, Poppins } from "next/font/google";
 import "./globals.css";
 
+const baloo2 = Baloo_2({
+  subsets: ["latin", "latin-ext"],
+  weight: ["700", "800"],
+  variable: "--font-baloo2",
+  display: "swap",
+});
+
+const poppins = Poppins({
+  subsets: ["latin", "latin-ext"],
+  weight: ["400", "500", "600"],
+  variable: "--font-poppins",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
-  title: "Educa - Atelier Didactic | Resurse Didactice pentru Învățători și Educatori",
-  description: "Resurse didactice create cu suflet, gata de adus în clasă pentru grădinițe și clasele primare.",
+  title: "EduZori — Platforma educatoarei organizate și inspirate",
+  description:
+    "Mai puțin timp cu hârtiile. Mai mult timp la grupă. Planificări, proiecte didactice, activități și materiale pentru grădiniță, organizate într-un singur loc conform Curriculum OMEN 4694/2019.",
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({
@@ -13,20 +31,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ro">
-      <body className="bg-[#FFFDF9] min-h-screen flex flex-col justify-between text-[#2D3748]">
-        <div>
-          <Navbar />
-          <main className="pb-16">{children}</main>
-        </div>
-        
-        {/* Footer */}
-        <footer className="w-full bg-[#FAF6EE] border-t border-[#EADFC9] py-8 text-center text-xs text-[#8A8373]">
-          <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p>© {new Date().getFullYear()} Educa - Atelier Didactic. Creat cu drag pentru cadrele didactice.</p>
-            <p className="font-semibold text-[#E06D53]">educatori • învățători • părinți</p>
-          </div>
-        </footer>
+    <html lang="ro" className={`${baloo2.variable} ${poppins.variable}`}>
+      <body className="bg-cream font-body text-charcoal antialiased min-h-screen selection:bg-powderPink selection:text-charcoal">
+        {children}
       </body>
     </html>
   );

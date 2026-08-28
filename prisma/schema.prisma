@@ -1,0 +1,130 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum SubscriptionTier {
+  FREE
+  STANDARD
+  PREMIUM
+}
+
+enum PlanStatus {
+  DRAFT
+  READY
+}
+
+enum DomainCategory {
+  DLC
+  DS
+  DOS
+  DEC
+  DPM
+}
+
+enum ActivityCategory {
+  ADE
+  ALA1
+  ALA2
+  ADP
+}
+
+model User {
+  id               String           @id @default(cuid())
+  email            String           @unique
+  name             String
+  kindergartenName String?
+  county           String?
+  gradeLevel       String?          // Mică, Mijlocie, Mare
+  subscriptionTier SubscriptionTier @default(FREE)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  dayPlans       DayPlan[]
+  lessonPlans    LessonPlan[]
+  condicaEntries CondicaEntry[]
+  favorites      Favorite[]
+}
+
+model DayPlan {
+  id                String     @id @default(cuid())
+  userId            String
+  user              User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date              DateTime
+  gradeLevel        String     // Mică, Mijlocie, Mare
+  theme             String
+  subtheme          String
+  adpMorningMeeting String     @db.Text
+  adePlanJson       String     @db.Text
+  ala1CentersJson   String     @db.Text
+  ala2GamesJson     String     @db.Text
+  adpTransitions    String     @db.Text
+  worksheetData     String?    @db.Text
+  status            PlanStatus @default(DRAFT)
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+}
+
+model LessonPlan {
+  id               String           @id @default(cuid())
+  userId           String
+  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title            String
+  gradeLevel       String
+  domain           DomainCategory
+  category         ActivityCategory
+  objectives       String           @db.Text
+  contentTableJson String           @db.Text
+  isAiGenerated    Boolean          @default(true)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  favorites Favorite[]
+}
+
+model CondicaEntry {
+  id                String    @id @default(cuid())
+  userId            String
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date              DateTime
+  gradeLevel        String
+  theme             String
+  activitiesSummary String    @db.Text
+  exportedAt        DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+}
+
+model Resource {
+  id             String    @id @default(cuid())
+  title          String
+  slug           String    @unique
+  description    String    @db.Text
+  category       String
+  gradeLevel     String
+  domain         String?
+  season         String?
+  downloadUrl    String
+  previewUrl     String?
+  isFree         Boolean   @default(true)
+  downloadsCount Int       @default(0)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  favorites Favorite[]
+}
+
+model Favorite {
+  id           String      @id @default(cuid())
+  userId       String
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  resourceId   String?
+  resource     Resource?   @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+  lessonPlanId String?
+  lessonPlan   LessonPlan? @relation(fields: [lessonPlanId], references: [id], onDelete: Cascade)
+  createdAt    DateTime    @default(now())
+}
